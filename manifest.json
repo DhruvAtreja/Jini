@@ -1,7 +1,6 @@
 {
-    // Comments are accepted in the manifest, even though it is JSON.
     "manifest_version": 3,
-    "name": "Chrome Extension v3 Starter",
+    "name": "Jini",
     "description": "A minimal example of a chrome extension using manifest v3",
     "version": "0.0.1",
     "icons": {
@@ -22,7 +21,8 @@
         "service_worker": "service-worker.js"
     },
     "content_scripts": [{
+        "css": [ "content.css" ],
         "js": ["foreground.js"],
-        "matches": ["https://github.com/*"]
+        "matches": ["*://*/*"]
     }]
 }

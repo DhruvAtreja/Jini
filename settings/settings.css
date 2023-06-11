@@ -6,3 +6,107 @@ body {
 .special-text {
     color: red;
 }
+
+.hide{
+    display: none !important;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  #main-wrapper{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #E1E8FD;
+    overflow: hidden;
+    #floating-snap-btn-wrapper {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 40%;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      .fab-btn {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #6B26BB;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0px 2px 17px -1px rgba(0,0,0,0.3);
+      }
+      ul {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        li {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f7f7f7;
+          color: black;
+          list-style-type: none;
+          transform: scale(0.95);
+          transition: .5s;
+          border-radius: 50%;
+        }
+      }
+      &.fab-active {
+        li:hover{
+         background-color: #f8e487;
+        }
+      &.left {
+         li:nth-child(1) {
+          top: 0%;
+          left: 300%;
+          transition-delay: 0s;
+        }
+        li:nth-child(2) {
+          top: 0%;
+          left: 200%;
+          transition-delay: 0.2s;
+        }
+        li:nth-child(3) {
+          top: 0%;
+          left: 100%;
+          transition-delay: 0.4s;
+        }
+      }
+      &.right {
+        li:nth-child(1) {
+          top: 0%;
+          left: -300%;
+          transition-delay: 0s;
+        }
+        li:nth-child(2) {
+          top: 0%;
+          left: -200%;
+          transition-delay: 0.2s;
+        }
+        li:nth-child(3) {
+          top: 0%;
+          left: -100%;
+          transition-delay: 0.4s;
+        }
+      }
+    }
+    }
+  }

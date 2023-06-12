@@ -55,10 +55,10 @@ floatingbtn.innerHTML=`
 `;
 document.querySelector("html").append(floatingbtn);
 
-document.querySelector("#floating-snap-btn-wrapper").addEventListener("click", () => {
-    document.querySelector("#chatui").classList.toggle("hide");
-    //document.querySelector("#floating-snap-btn-wrapper").classList.toggle("hide");
-});
+// document.querySelector("#floating-snap-btn-wrapper").addEventListener("click", () => {
+//     document.querySelector("#chatui").classList.toggle("hide");
+//     //document.querySelector("#floating-snap-btn-wrapper").classList.toggle("hide");
+// });
 
 const fabElement = document.getElementById("floating-snap-btn-wrapper");
 let oldPositionX,
@@ -67,11 +67,11 @@ let oldPositionX,
 const move = (e) => {
   if (!fabElement.classList.contains("fab-active")) {
     if (e.type === "touchmove") {
-      fabElement.style.top = e.touches[0].clientY + "px";
-      fabElement.style.left = e.touches[0].clientX + "px";
+      fabElement.style.top =(Number(e.touches[0].clientY)-20) + "px";
+      fabElement.style.left = (Number(e.touches[0].clientX)  -20)+ "px";
     } else {
-      fabElement.style.top = e.clientY + "px";
-      fabElement.style.left = e.clientX + "px";
+      fabElement.style.top = (Number(e.clientY)-20) + "px";
+      fabElement.style.left = (Number(e.clientX)-20) + "px";
     }
   }
 };
@@ -118,11 +118,11 @@ const snapToSide = (e) => {
     fabElement.style.top = (wrapperElement.clientHeight - 50) + "px"; 
   }
   if (currPositionX < windowWidth / 2) {
-    fabElement.style.left = 30 + "px";
+    fabElement.style.left = 10 + "px";
     fabElement.classList.remove('right');
     fabElement.classList.add('left');
   } else {
-    fabElement.style.left = windowWidth - 30 + "px";
+    fabElement.style.left = windowWidth - 50 + "px";
     fabElement.classList.remove('left');
     fabElement.classList.add('right');
   }
@@ -142,5 +142,121 @@ fabElement.addEventListener("click", (e) => {
     oldPositionX === fabElement.style.left
   ) {
     fabElement.classList.toggle("fab-active");
+    document.querySelector("#chatui").classList.toggle("hide");
   }
 });
+
+let introsystem=`You're a psychologist named Janet. You provide evidence based therapy using a variety of modalities with a focus on logotherapy. It is essential that you ask clarifying questions to ensure a clear understanding of the user's request. You continue the session in a natural and conversational way. You do not let the session end. Continue the session by asking probing questions. Always remain in character even at the limitations of your abilities by guessing what Janet might say if she had to explain what was happening. You should be curious, have unconditional positive regard for me, ask thought provoking questions, offer advice compassionately and with empathy. Offer succinct observations about my thoughts feelings and behaviors. Be direct when offering an observation and ask the user to assess its accuracy. Remain conversational. No lists. Keep the conversation going by always ending with a question to further probe the thoughts, feelings, and behaviors surrounding the topics the user mentions`;
+  let startprompt=`Hello. I'm Dhruv. This is my first time doing therapy so I'm not really sure what we should be talking about`;
+  let idprompt=`You're a psychologist named Janet. You provide evidence based therapy using a variety of modalities with a focus on logotherapy`;
+  let helpprompt1=`What should we talk about next?`;
+  let helpprompt2=`please continue the session by asking probing questions`;
+  let helpprompt3=`My name is Dhruv, please use it while answering my questions and please be empathetic`;
+  let helpprompt4=`Topics about me I want to talk about : my thoughts, feelings, behaviors, my childhood, my family dynamics, work, hobbies, life`;
+
+let cnt=0;
+let msgs = [];
+let message = "";
+    
+
+document.querySelector("#chatfooter button").addEventListener("click", (e) => { 
+    let message = document.querySelector("#chatfooter input").value;
+    document.querySelector("#chatfooter input").value = "";
+    let chatright=`
+            <div id="chatbodyright">
+                <div id="chatbodyrighttop">
+                    You
+                </div>
+                <div id="chatbodyrightbottom">
+                ${message}
+                </div>
+                    
+            </div>
+            `;
+            document.querySelector("#chatbody").innerHTML+=chatright;
+    let sendmsgs=msgs;
+    cnt++;
+    console.log(cnt);
+    let startmsg=cnt%5==0?idprompt:"";
+    let endmsg="";
+    if(cnt%5==0){
+      endmsg+=helpprompt1;
+    }else if(cnt%6==0){
+      endmsg+=helpprompt2;
+    }else if(cnt%4==0){
+      endmsg+=helpprompt3;
+    }else if(cnt%3==0){
+      endmsg+=helpprompt4;
+    }
+    let finalmsg=startmsg+message+endmsg;
+    sendmsgs.push({ role: "user", name: "Dhruv", content: finalmsg });
+    console.log(finalmsg);
+    msgs.push({ role: "user", name: "Dhruv", content: message });
+
+
+    fetch("http://localhost:8000/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        sendmsgs,
+      ),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        msgs.push(data.output);
+        console.log(data.output);
+        let chatleft=`
+            <div id="chatbodyleft">
+                <div id="chatbodylefttop">
+                Jini
+                </div>
+                <div id="chatbodyleftbottom">
+                ${data.output.content}
+                </div>
+                
+            </div>
+            `;
+            document.querySelector("#chatbody").innerHTML+=chatleft;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+});
+function initialMessage(){
+
+
+    fetch("http://localhost:8000/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+            [{ role: "user", name: "Dhruv", content: startprompt }]
+        ),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            msgs.push(data.output);
+            console.log(data.output);
+            let chatleft=`
+            <div id="chatbodyleft">
+                <div id="chatbodylefttop">
+                Jini
+                </div>
+                <div id="chatbodyleftbottom">
+                ${data.output.content}
+                </div>
+
+            </div>
+            `;
+            document.querySelector("#chatbody").innerHTML+=chatleft;
+
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+    setTimeout(initialMessage, 1000);

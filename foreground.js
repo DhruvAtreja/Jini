@@ -157,7 +157,39 @@ let introsystem=`You're a psychologist named Janet. You provide evidence based t
 let cnt=0;
 let msgs = [];
 let message = "";
-    
+let usermessages = ""; //usermessages except last 10;
+let usermessagessummary = "";
+let lastcnt=0;    
+function getSummary(){
+  let sendsummary=[{ role: "user", name: "Dhruv", content: "Summarise the following: " + usermessages }]
+  lastcnt=cnt-20;
+  fetch("http://localhost:8000/summary", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        sendsummary,
+      ),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        usermessages=data.output.content;
+        usermessagessummary = usermessages;
+        console.log(usermessages);
+        
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+}
+
+setInterval(function(){
+    if(usermessages!=usermessagessummary && cnt>20){
+        getSummary();
+    }
+}, 60000);
 
 document.querySelector("#chatfooter button").addEventListener("click", (e) => { 
     let message = document.querySelector("#chatfooter input").value;
@@ -173,8 +205,10 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
                     
             </div>
             `;
-            document.querySelector("#chatbody").innerHTML+=chatright;
-    let sendmsgs=msgs;
+    document.querySelector("#chatbody").innerHTML+=chatright;
+    document.querySelector("#chatbody").scrollTo(0,1000000);
+    
+    let sendmsgs = JSON.parse(JSON.stringify(msgs));
     cnt++;
     console.log(cnt);
     let startmsg=cnt%5==0?idprompt:"";
@@ -192,7 +226,19 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
     sendmsgs.push({ role: "user", name: "Dhruv", content: finalmsg });
     console.log(finalmsg);
     msgs.push({ role: "user", name: "Dhruv", content: message });
-
+    console.log(sendmsgs);
+    if(msgs.length>4){
+        if(msgs[0].role=="assistant"){
+            msgs.shift();
+            sendmsgs.shift();
+        }
+        let initialmsg=msgs.shift();
+        usermessages+= " " + initialmsg.content;
+        msgs.shift();
+        sendmsgs.splice(0,2);
+        sendmsgs[0].content=usermessages+ " " + sendmsgs[0].content;
+        console.log(sendmsgs);
+    }
 
     fetch("http://localhost:8000/", {
       method: "POST",
@@ -219,6 +265,7 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
             </div>
             `;
             document.querySelector("#chatbody").innerHTML+=chatleft;
+            document.querySelector("#chatbody").scrollTo(0,1000000)
       })
       .catch((error) => {
         console.log(error);
@@ -260,3 +307,5 @@ function initialMessage(){
         });
     }
     setTimeout(initialMessage, 1000);
+
+

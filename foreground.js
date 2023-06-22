@@ -18,22 +18,7 @@ chatui.innerHTML=`
     </div>
 </div>
 <div id="chatbody">
-    <div id="chatbodyleft">
-        <div id="chatbodylefttop">
-            Jini
-        </div>
-        <div id="chatbodyleftbottom">
-            Message
-        </div>
-    </div>
-    <div id="chatbodyright">
-        <div id="chatbodyrighttop">
-            You
-        </div>
-        <div id="chatbodyrightbottom">
-            Message
-        </div>
-    </div>
+    
 </div>
 <div id="chatfooter">
     <input type="text" placeholder="How do you feel?">
@@ -157,8 +142,8 @@ let introsystem=`You're a psychologist named Janet. You provide evidence based t
 let cnt=0;
 let msgs = [];
 let message = "";
-let usermessages = ""; //usermessages except last 10;
-let usermessagessummary = "";
+let usermessages = idprompt+helpprompt3+ helpprompt4; //usermessages except last 10;
+let usermessagessummary = usermessages;
 let lastcnt=0;    
 function getSummary(){
   let sendsummary=[{ role: "user", name: "Dhruv", content: "Summarise the following: " + usermessages }]
@@ -189,7 +174,7 @@ setInterval(function(){
     if(usermessages!=usermessagessummary && cnt>20){
         getSummary();
     }
-}, 60000);
+}, 120000);
 
 document.querySelector("#chatfooter button").addEventListener("click", (e) => { 
     let message = document.querySelector("#chatfooter input").value;
@@ -214,20 +199,20 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
     let startmsg=cnt%5==0?idprompt:"";
     let endmsg="";
     if(cnt%5==0){
-      endmsg+=helpprompt1;
+      //endmsg+=helpprompt1;
     }else if(cnt%6==0){
       endmsg+=helpprompt2;
     }else if(cnt%4==0){
-      endmsg+=helpprompt3;
+      //endmsg+=helpprompt3;
     }else if(cnt%3==0){
-      endmsg+=helpprompt4;
+      //endmsg+=helpprompt4;
     }
     let finalmsg=startmsg+message+endmsg;
     sendmsgs.push({ role: "user", name: "Dhruv", content: finalmsg });
     console.log(finalmsg);
     msgs.push({ role: "user", name: "Dhruv", content: message });
     console.log(sendmsgs);
-    if(msgs.length>4){
+    if(msgs.length>16){
         if(msgs[0].role=="assistant"){
             msgs.shift();
             sendmsgs.shift();
@@ -238,7 +223,14 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
         sendmsgs.splice(0,2);
         sendmsgs[0].content=usermessages+ " " + sendmsgs[0].content;
         console.log(sendmsgs);
+        
     }
+    chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
+        console.log("Value is set");
+      });
+      chrome.storage.local.set({ jiniui: document.querySelector("#chatui").innerHTML }).then(() => {
+        console.log("UI is set");
+      });
 
     fetch("http://localhost:8000/", {
       method: "POST",
@@ -266,6 +258,12 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
             `;
             document.querySelector("#chatbody").innerHTML+=chatleft;
             document.querySelector("#chatbody").scrollTo(0,1000000)
+            chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
+                console.log("Value is set");
+              });
+              chrome.storage.local.set({ jiniui: document.querySelector("#chatui").innerHTML }).then(() => {
+                console.log("UI is set");
+              });
       })
       .catch((error) => {
         console.log(error);
@@ -273,39 +271,98 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
 
 });
 function initialMessage(){
+    chrome.storage.local.get("jiniui").then((result) => {
+        if(result.jiniui&&result.jiniui.length>0){
+            return;
+        }
+        else{
+            fetch("http://localhost:8000/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(
+                    [{ role: "user", name: "Dhruv", content: startprompt }]
+                ),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    msgs.push(data.output);
+                    console.log(data.output);
+                    let chatleft=`
+                    <div id="chatbodyleft">
+                        <div id="chatbodylefttop">
+                        Jini
+                        </div>
+                        <div id="chatbodyleftbottom">
+                        ${data.output.content}
+                        </div>
+        
+                    </div>
+                    `;
+                    document.querySelector("#chatbody").innerHTML+=chatleft;
+                    chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
+                        console.log("Value is set");
+                      });
+                      chrome.storage.local.set({ jiniui: document.querySelector("#chatui").innerHTML }).then(() => {
+                        console.log("UI is set");
+                      });
+        
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+    });
 
-
-    fetch("http://localhost:8000/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-            [{ role: "user", name: "Dhruv", content: startprompt }]
-        ),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            msgs.push(data.output);
-            console.log(data.output);
-            let chatleft=`
-            <div id="chatbodyleft">
-                <div id="chatbodylefttop">
-                Jini
-                </div>
-                <div id="chatbodyleftbottom">
-                ${data.output.content}
-                </div>
-
-            </div>
-            `;
-            document.querySelector("#chatbody").innerHTML+=chatleft;
-
-        })
-        .catch((error) => {
-            console.log(error);
-        });
     }
-    setTimeout(initialMessage, 1000);
+    setTimeout(initialMessage, 500);
+
+    setInterval(function(){
+        chrome.storage.local.get(["jinimsgs"]).then((result) => {
+            if(JSON.stringify(result.jinimsgs)!=JSON.stringify(msgs)){
+                console.log("changed");
+                console.log(result.jinimsgs);
+                console.log(msgs);
+                msgs=result.jinimsgs;
+                document.querySelector("#chatbody").innerHTML="";
+                msgs.forEach(msg => {
+                    if(msg.role=="user"){
+                        let chatright=`
+                        <div id="chatbodyright">
+                            <div id="chatbodyrighttop">
+                                You
+                            </div>
+                            <div id="chatbodyrightbottom">
+                            ${msg.content}
+                            </div>
+                                
+                        </div>
+                        `;
+                        document.querySelector("#chatbody").innerHTML+=chatright;
+                    }else{
+                        let chatleft=`
+                        <div id="chatbodyleft">
+                            <div id="chatbodylefttop">
+                            Jini
+                            </div>
+                            <div id="chatbodyleftbottom">
+                            ${msg.content}
+                            </div>
+                            
+                        </div>
+                        `;
+                        document.querySelector("#chatbody").innerHTML+=chatleft;
+                    }
+                });
+                if(msgs.length>16){
+                    document.querySelector("#chatleft").display="none";
+                    document.querySelector("#chatright").display="none";
+                }
+                document.querySelector("#chatbody").scrollTo(0,1000000);
+            }
+          })
+    },5000);
+
 
 

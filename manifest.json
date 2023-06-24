@@ -24,5 +24,10 @@
         "css": [ "content.css" ],
         "js": ["foreground.js"],
         "matches": ["*://*/*"]
+    }],
+    "web_accessible_resources": [{
+        "resources": ["note.mp3"],
+        "matches": ["*://*/*"]
     }]
+		
 }

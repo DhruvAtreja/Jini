@@ -12,7 +12,7 @@ chatui.innerHTML=`
 <div id="chatheader">
     <div id="chatheaderleft">Jini</div>
     <div id="chatheaderright">
-        <button>Meditate</button>
+        <button id="meditateopen">Meditate</button>
         <button>Journal</button>
         <span id="minmaxbtn">v</span>
     </div>
@@ -29,6 +29,11 @@ document.querySelector("html").append(chatui);
 
 document.querySelector("#minmaxbtn").addEventListener("click", () => {
     document.querySelector("#chatui").classList.toggle("hide");
+});
+
+document.querySelector("#meditateopen").addEventListener("click", () => {
+    document.querySelector("#meditatemodal").style.display="block";
+    document.querySelector("#chatui").style.display="none";
 });
 
 const floatingbtn = document.createElement("div");
@@ -363,6 +368,92 @@ function initialMessage(){
             }
           })
     },5000);
+
+
+    let meditateelement=document.createElement("div");
+    meditateelement.id="meditatemodal";
+    meditateelement.innerHTML=`
+    <div id="meditateheader">
+    </div>
+        <div id="meditatebody">
+            <span id="meditatebodytext" class="topmeditatetext">I want to meditate for:</span>
+            <input  id="meditatebodyinput" placeholder="10">
+            <span id="meditatebodytext">minutes</span>
+        </div>
+        <div id="meditatefooter">
+            <button id="meditatefooterbutton">Start</button>
+            <button id="meditatefootercancel">Cancel</button>
+        </div>
+    `;
+    document.querySelector("html").appendChild(meditateelement);
+
+    document.querySelector("#meditatefootercancel").addEventListener("click",function(){
+        document.querySelector("#meditatemodal").style.display="none";
+        document.querySelector("#chatui").style.display="block";
+    });
+    document.querySelector("#meditatefooterbutton").addEventListener("click",function(){
+        document.querySelector("#meditatemodal").style.display="none";
+        document.querySelector("#meditatetimer").style.display="block";
+        meditatingdone=false;
+        startTimer((document.querySelector("#meditatebodyinput").value||10)*60,document.querySelector("#meditatetimerbodytime"));
+    });
+
+    let intervalidmeditate;
+    let meditatingdone=true;
+    function startTimer(duration, display) {
+        let timer = duration, minutes, seconds;
+        intervalidmeditate=setInterval(function () {
+            if(meditatingdone){
+                    clearInterval(intervalidmeditate);
+                    document.querySelector("#meditatetimer").style.display="none";
+                    document.querySelector("#chatui").style.display="block";
+            }
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+    
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+    
+            display.innerText = minutes + ":" + seconds;
+    
+            if (--timer < 0) {
+                finishsound();
+                finishsound();
+                timer = duration;
+                meditatingdone=true;
+            }
+        }, 1000);
+    }
+
+    let meditatetimer=document.createElement("div");
+    meditatetimer.id="meditatetimer";
+    meditatetimer.innerHTML=`
+    <div id="meditatetimerbody">
+        <span id="meditatetimerbodytime">00:00</span>
+    </div>
+    <div id="meditatetimerfooter">
+        <button id="meditatetimerfooterbutton">Close</button>
+    </div>
+    `;
+
+    document.querySelector("html").appendChild(meditatetimer);
+    document.querySelector("#meditatetimerfooterbutton").addEventListener("click",function(){
+        document.querySelector("#meditatetimer").style.display="none";
+        document.querySelector("#chatui").style.display="block";
+        clearInterval(intervalidmeditate);
+    });
+
+    
+   function finishsound() {
+        let url = chrome.runtime.getURL('note.mp3')
+        console.log(url)
+    
+        let a = new Audio(url)
+        a.play()
+    };
+
+
+    
 
 
 

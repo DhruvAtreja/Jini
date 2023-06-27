@@ -13,7 +13,7 @@ chatui.innerHTML=`
     <div id="chatheaderleft">Jini</div>
     <div id="chatheaderright">
         <button id="meditateopen">Meditate</button>
-        <button>Journal</button>
+        <button id="clearbtnjini">Clear</button>
         <span id="minmaxbtn">v</span>
     </div>
 </div>
@@ -26,6 +26,9 @@ chatui.innerHTML=`
 </div>
 `;
 document.querySelector("html").append(chatui);
+document.querySelector("#clearbtnjini").addEventListener("click", () => {
+  restartconversation();
+});
 
 document.querySelector("#minmaxbtn").addEventListener("click", () => {
     document.querySelector("#chatui").classList.toggle("hide");
@@ -233,9 +236,7 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
     chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
         console.log("Value is set");
       });
-      chrome.storage.local.set({ jiniui: document.querySelector("#chatui").innerHTML }).then(() => {
-        console.log("UI is set");
-      });
+      
 
     fetch("http://localhost:8000/", {
       method: "POST",
@@ -266,9 +267,7 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
             chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
                 console.log("Value is set");
               });
-              chrome.storage.local.set({ jiniui: document.querySelector("#chatui").innerHTML }).then(() => {
-                console.log("UI is set");
-              });
+              
       })
       .catch((error) => {
         console.log(error);
@@ -276,8 +275,8 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
 
 });
 function initialMessage(){
-    chrome.storage.local.get("jiniui").then((result) => {
-        if(result.jiniui&&result.jiniui.length>0){
+    chrome.storage.local.get("jinimsgs").then((result) => {
+        if(result.jinimsgs&&result.jinimsgs.length>0){
             return;
         }
         else{
@@ -309,9 +308,7 @@ function initialMessage(){
                     chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
                         console.log("Value is set");
                       });
-                      chrome.storage.local.set({ jiniui: document.querySelector("#chatui").innerHTML }).then(() => {
-                        console.log("UI is set");
-                      });
+                      
         
                 })
                 .catch((error) => {
@@ -451,6 +448,16 @@ function initialMessage(){
         let a = new Audio(url)
         a.play()
     };
+
+
+    function restartconversation(){
+      msgs=[];
+      chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
+        console.log("Restarted");
+        document.querySelector("#chatbody").innerHTML="";
+        initialMessage();
+      });
+    }
 
 
     

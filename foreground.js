@@ -3,6 +3,7 @@
 // (see "content_script" key).
 // Several foreground scripts can be declared
 // and injected into the same or different pages.
+let jinicolor="orange";
 
 console.log("This prints to the console of the page (injected only if the page url matched)")
 
@@ -43,7 +44,8 @@ const floatingbtn = document.createElement("div");
 floatingbtn.setAttribute("id", "floating-snap-btn-wrapper");
 floatingbtn.innerHTML=`
     <div class="fab-btn">
-       <ion-icon name="share-social"></ion-icon>
+      Jini
+       
     </div>
 `;
 document.querySelector("html").append(floatingbtn);
@@ -199,6 +201,7 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
             </div>
             `;
     document.querySelector("#chatbody").innerHTML+=chatright;
+    setcolorfast(jinicolor);
     document.querySelector("#chatbody").scrollTo(0,1000000);
     
     let sendmsgs = JSON.parse(JSON.stringify(msgs));
@@ -263,6 +266,8 @@ document.querySelector("#chatfooter button").addEventListener("click", (e) => {
             </div>
             `;
             document.querySelector("#chatbody").innerHTML+=chatleft;
+            setcolorfast(jinicolor);
+            
             document.querySelector("#chatbody").scrollTo(0,1000000)
             chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
                 console.log("Value is set");
@@ -305,6 +310,7 @@ function initialMessage(){
                     </div>
                     `;
                     document.querySelector("#chatbody").innerHTML+=chatleft;
+                    setcolorfast(jinicolor);
                     chrome.storage.local.set({ jinimsgs: msgs }).then(() => {
                         console.log("Value is set");
                       });
@@ -318,7 +324,7 @@ function initialMessage(){
     });
 
     }
-    setTimeout(initialMessage, 500);
+    setTimeout(initialMessage, 100);
 
     setInterval(function(){
         chrome.storage.local.get(["jinimsgs"]).then((result) => {
@@ -342,6 +348,7 @@ function initialMessage(){
                         </div>
                         `;
                         document.querySelector("#chatbody").innerHTML+=chatright;
+                        setcolorfast(jinicolor);
                     }else{
                         let chatleft=`
                         <div id="chatbodyleft">
@@ -355,6 +362,7 @@ function initialMessage(){
                         </div>
                         `;
                         document.querySelector("#chatbody").innerHTML+=chatleft;
+                        setcolorfast(jinicolor);
                     }
                 });
                 if(msgs.length>16){
@@ -459,8 +467,80 @@ function initialMessage(){
       });
     }
 
+    function setcolorfast(color){
+      if(color=="orange"){
+        document.querySelector(".fab-btn").style.backgroundColor="orange";
+        document.querySelector("#chatui").style.backgroundColor="orange";
+        document.querySelector("#chatbody").style.backgroundColor="#FFEEDB";  
+        document.querySelectorAll("#chatbodyleft").forEach(element => {
+          element.style.backgroundColor="orange";
+        });
+        document.querySelectorAll("#chatbodyright").forEach(element => {
+          element.style.backgroundColor="orange";
+        });
+      }else if(color=="blue"){
+        document.querySelector(".fab-btn").style.backgroundColor="#22b3ff";
+        document.querySelector("#chatui").style.backgroundColor="#22b3ff";
+        document.querySelector("#chatbody").style.backgroundColor="#e9f5fd";
+        document.querySelectorAll("#chatbodyleft").forEach(element => {
+          element.style.backgroundColor="#22b3ff";
+        });
+        document.querySelectorAll("#chatbodyright").forEach(element => {
+          element.style.backgroundColor="#22b3ff";
+        });
+      }
+      else if(color=="pink"){
+        document.querySelector(".fab-btn").style.backgroundColor="#ff8da1";     
+        document.querySelector("#chatui").style.backgroundColor="#ff8da1";
+        document.querySelector("#chatbody").style.backgroundColor="#ffe5ea";
+        document.querySelectorAll("#chatbodyleft").forEach(element => {
+          element.style.backgroundColor="#ff8da1";
+        });
+        document.querySelectorAll("#chatbodyright").forEach(element => {
+          element.style.backgroundColor="#ff8da1";
+        });
+      }
+    }
 
-    
+    function setcolor(){
+      chrome.storage.local.get("jinicolor").then((result) => {
+        console.log(result.jinicolor);
+        jinicolor=result.jinicolor;
+        if(result.jinicolor=="orange"){
+          document.querySelector(".fab-btn").style.backgroundColor="orange";
+          document.querySelector("#chatui").style.backgroundColor="orange";
+          document.querySelector("#chatbody").style.backgroundColor="#FFEEDB";  
+          document.querySelectorAll("#chatbodyleft").forEach(element => {
+            element.style.backgroundColor="orange";
+          });
+          document.querySelectorAll("#chatbodyright").forEach(element => {
+            element.style.backgroundColor="orange";
+          });
+        }else if(result.jinicolor=="blue"){
+          document.querySelector(".fab-btn").style.backgroundColor="#22b3ff";
+          document.querySelector("#chatui").style.backgroundColor="#22b3ff";
+          document.querySelector("#chatbody").style.backgroundColor="#e9f5fd";
+          document.querySelectorAll("#chatbodyleft").forEach(element => {
+            element.style.backgroundColor="#22b3ff";
+          });
+          document.querySelectorAll("#chatbodyright").forEach(element => {
+            element.style.backgroundColor="#22b3ff";
+          });
+        }
+        else if(result.jinicolor=="pink"){
+          document.querySelector(".fab-btn").style.backgroundColor="#ff8da1";        
+          document.querySelector("#chatui").style.backgroundColor="#ff8da1";
+          document.querySelector("#chatbody").style.backgroundColor="#ffe5ea";
+          document.querySelectorAll("#chatbodyleft").forEach(element => {
+            element.style.backgroundColor="#ff8da1";
+          });
+          document.querySelectorAll("#chatbodyright").forEach(element => {
+            element.style.backgroundColor="#ff8da1";
+          });
+        }
 
+  });
+}
 
+setInterval(setcolor,3000);
 

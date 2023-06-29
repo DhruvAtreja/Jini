@@ -658,7 +658,7 @@
     --sans-serif: "ColfaxAI",helvetica,sans-serif;
     --monospace: "Roboto Mono",sfmono-regular,consolas,liberation mono,menlo,courier,monospace;
     -webkit-font-smoothing: antialiased;
-    color: var(--text-default);
+    color:white;
     font-family: var(--sans-serif);
     font-size: var(--font-size-small);
     box-sizing: border-box;
@@ -1000,6 +1000,13 @@
         color: white;
         z-index: 1000;
         box-shadow: 0px 2px 17px -1px rgba(0,0,0,0.3);
+        background-color: rgb(255, 141, 161);
+        padding: 15px;
+        /* overflow: clip; */
+        box-sizing: border-box;
+        color: white;
+        font-size: 15px;
+
       }
       ul {
         position: relative;
@@ -1081,6 +1088,17 @@
     background-color: orange;
     height: 50px;
     border-radius: 25px;
+    background-color: rgb(255, 141, 161);
+    padding: 15px;
+    /* overflow: clip; */
+    box-sizing: border-box;
+    color: white;
+    font-size: 15px;
+
+}
+
+.fab-btn:hover{
+    cursor: pointer;
 }
 
 #chatbodyleftbottom{

@@ -26,7 +26,7 @@
         "matches": ["*://*/*"]
     }],
     "web_accessible_resources": [{
-        "resources": ["note.mp3"],
+        "resources": ["note.mp3", "donatefirst.jpg", "donatesecond.jpg"],
         "matches": ["*://*/*"]
     }]
 		

@@ -16,4 +16,11 @@ document.addEventListener('DOMContentLoaded',()=>{
             console.log("Value is blue");
           });
     });
+    document.querySelector('#jinidonatebtn').addEventListener('click', function() {
+        chrome.storage.local.set({ jinidonateopen: "true" }).then(() => {
+            setTimeout(() => {
+                chrome.storage.local.set({ jinidonateopen: "false" }).then(() => {});
+            }, 3000);
+        });
+    });
 })

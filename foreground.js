@@ -9,6 +9,7 @@ console.log("This prints to the console of the page (injected only if the page u
 
 let chatui = document.createElement("div");
 chatui.setAttribute("id", "chatui");
+chatui.setAttribute("class", "hide");
 chatui.innerHTML=`
 <div id="chatheader">
     <div id="chatheaderleft">Jini</div>
@@ -37,7 +38,7 @@ document.querySelector("#minmaxbtn").addEventListener("click", () => {
 
 document.querySelector("#meditateopen").addEventListener("click", () => {
     document.querySelector("#meditatemodal").style.display="block";
-    document.querySelector("#chatui").style.display="none";
+    document.querySelector("#chatui").classList.toggle("hide");
 });
 
 const floatingbtn = document.createElement("div");
@@ -137,7 +138,20 @@ fabElement.addEventListener("click", (e) => {
     oldPositionX === fabElement.style.left
   ) {
     fabElement.classList.toggle("fab-active");
-    document.querySelector("#chatui").classList.toggle("hide");
+    chrome.storage.local.get("jinidonate").then((result) => {
+      console.log(result.jinidonate);
+      if(document.querySelector("#chatui").style.display=="block"){
+        document.querySelector("#chatui").classList.toggle("hide");
+        return;
+      }else{
+        if((!result.jinidonate)&&Math.random()<0.33){
+          document.querySelector("#donatemodal").style.display="block";
+        }else{
+          document.querySelector("#chatui").classList.toggle("hide");
+        }
+      }
+
+    });
   }
 });
 
@@ -328,7 +342,7 @@ function initialMessage(){
 
     setInterval(function(){
         chrome.storage.local.get(["jinimsgs"]).then((result) => {
-            if(JSON.stringify(result.jinimsgs)!=JSON.stringify(msgs)){
+            if(result.jinimsgs&&JSON.stringify(result.jinimsgs)!=JSON.stringify(msgs)){
                 console.log("changed");
                 console.log(result.jinimsgs);
                 console.log(msgs);
@@ -394,7 +408,7 @@ function initialMessage(){
 
     document.querySelector("#meditatefootercancel").addEventListener("click",function(){
         document.querySelector("#meditatemodal").style.display="none";
-        document.querySelector("#chatui").style.display="block";
+        document.querySelector("#chatui").classList.toggle("hide");
     });
     document.querySelector("#meditatefooterbutton").addEventListener("click",function(){
         document.querySelector("#meditatemodal").style.display="none";
@@ -411,7 +425,7 @@ function initialMessage(){
             if(meditatingdone){
                     clearInterval(intervalidmeditate);
                     document.querySelector("#meditatetimer").style.display="none";
-                    document.querySelector("#chatui").style.display="block";
+                    document.querySelector("#chatui").classList.toggle("hide");
             }
             minutes = parseInt(timer / 60, 10);
             seconds = parseInt(timer % 60, 10);
@@ -444,7 +458,7 @@ function initialMessage(){
     document.querySelector("html").appendChild(meditatetimer);
     document.querySelector("#meditatetimerfooterbutton").addEventListener("click",function(){
         document.querySelector("#meditatetimer").style.display="none";
-        document.querySelector("#chatui").style.display="block";
+        document.querySelector("#chatui").classList.toggle("hide");
         clearInterval(intervalidmeditate);
     });
 
@@ -503,6 +517,11 @@ function initialMessage(){
     }
 
     function setcolor(){
+      chrome.storage.local.get("jinidonateopen").then((result) => {
+        if(result.jinidonateopen=="true"){
+          document.querySelector("#donatemodal").style.display="block";
+        }
+      });
       chrome.storage.local.get("jinicolor").then((result) => {
         console.log(result.jinicolor);
         jinicolor=result.jinicolor;
@@ -542,5 +561,82 @@ function initialMessage(){
   });
 }
 
-setInterval(setcolor,3000);
+setInterval(setcolor,1000);
+
+
+const donatemodal = document.createElement("div");
+donatemodal.id = "donatemodal";
+const holdImg = document.createElement("img");
+holdImg.id = "holdImg";
+let imgPath = chrome.runtime.getURL("donatefirst.jpg")
+holdImg.src = imgPath;
+// donatemodal.appendChild(holdImg);
+document.querySelector("html").appendChild(donatemodal);
+donatemodal.style.backgroundImage = "url(" + imgPath + ")";
+let toggledonate=1;
+setInterval(() => {
+  if(toggledonate){
+    imgPath=chrome.runtime.getURL("donatesecond.jpg");
+    document.querySelector("#donatemodal").style.backgroundImage = "url(" + imgPath + ")";
+    
+  }
+  else{
+    imgPath=chrome.runtime.getURL("donatefirst.jpg");
+    document.querySelector("#donatemodal").style.backgroundImage = "url(" + imgPath + ")";
+   
+  }
+  toggledonate=!toggledonate;
+}, 5000);
+setTimeout(() => {
+  donatemodal.innerHTML=`
+<div id="donatemodalheader">
+  JiniCares: Feeding and Schooling Children of War Torn Countries
+</div>
+<div id="donatemodalbody">
+ We are a non-profit organization, help us feed and educate orphaned children of countries like Syria, Congo, Ukraine. It'll only take a minute and you can change a child's life forever. 
+</div>
+<div id="donatemodalbuttons">
+  <button id="donatemodalbutton1">Donate Once</button>
+  <button id="donatemodalbutton2">Donate a Bit Monthly</button>
+  <button id="donatemodalbutton3">Ask me later</button>
+  <button id="donatemodalbutton4">Never Ask Again</button>
+
+</div>
+`;
+
+document.querySelector("#donatemodalbutton1").addEventListener("click",function(){
+  window.open("https://buy.stripe.com/cN27t2d8p1zidGwcMM","_blank");
+  document.querySelector("#donatemodal").style.display="none";
+  document.querySelector("#chatui").classList.toggle("hide");
+});
+document.querySelector("#donatemodalbutton2").addEventListener("click",function(){
+  window.open("https://buy.stripe.com/00g3cM0lDb9S7i8289","_blank");
+  document.querySelector("#donatemodal").style.display="none";
+  document.querySelector("#chatui").classList.toggle("hide");
+});
+document.querySelector("#donatemodalbutton3").addEventListener("click",function(){
+  document.querySelector("#donatemodal").style.display="none";
+  document.querySelector("#chatui").classList.toggle("hide");
+});
+
+document.querySelector("#donatemodalbutton4").addEventListener("click",function(){
+  document.querySelector("#donatemodal").style.display="none";
+  document.querySelector("#chatui").classList.toggle("hide");
+  chrome.storage.local.set({ jinidonate: "hide" }).then(() => {
+    console.log("Don't ask again");
+  });
+});
+
+}, 2000);
+chrome.storage.local.get("jinicolor").then((result) => {
+  if(!result.jinicolor){
+    chrome.storage.local.set({ jinicolor: "orange" }).then(() => {
+      console.log("Color set");
+    });
+  }
+});
+
+
+
+
 

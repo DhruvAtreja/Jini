@@ -12,7 +12,7 @@ chatui.setAttribute("id", "chatui");
 chatui.setAttribute("class", "hide");
 chatui.innerHTML=`
 <div id="chatheader">
-    <div id="chatheaderleft">Jini</div>
+    <div id="chatheaderleft"></div>
     <div id="chatheaderright">
         <button id="meditateopen">Meditate</button>
         <button id="clearbtnjini">Clear</button>
@@ -28,6 +28,12 @@ chatui.innerHTML=`
 </div>
 `;
 document.querySelector("html").append(chatui);
+const chathreaderlogo = document.createElement("img");
+chathreaderlogo.id = "chatheaderlogo";
+let chatheaderlogopath = chrome.runtime.getURL("rectangle2.png")
+chathreaderlogo.src = chatheaderlogopath;
+document.querySelector("#chatheaderleft").append(chathreaderlogo);
+
 document.querySelector("#clearbtnjini").addEventListener("click", () => {
   restartconversation();
 });
@@ -45,7 +51,7 @@ const floatingbtn = document.createElement("div");
 floatingbtn.setAttribute("id", "floating-snap-btn-wrapper");
 floatingbtn.innerHTML=`
     <div class="fab-btn">
-      Jini
+      
        
     </div>
 `;
@@ -55,6 +61,12 @@ document.querySelector("html").append(floatingbtn);
 //     document.querySelector("#chatui").classList.toggle("hide");
 //     //document.querySelector("#floating-snap-btn-wrapper").classList.toggle("hide");
 // });
+const floatinglogo = document.createElement("img");
+floatinglogo.id = "floatinglogo";
+let floatinglogopath = chrome.runtime.getURL("481.png")
+floatinglogo.src = floatinglogopath;
+// document.querySelector(".fab-btn").append(floatinglogo);
+document.querySelector(".fab-btn").style.backgroundImage = "url("+floatinglogopath+")";
 
 const fabElement = document.getElementById("floating-snap-btn-wrapper");
 let oldPositionX,
@@ -114,11 +126,11 @@ const snapToSide = (e) => {
     fabElement.style.top = (wrapperElement.clientHeight - 50) + "px"; 
   }
   if (currPositionX < windowWidth / 2) {
-    fabElement.style.left = 10 + "px";
+    fabElement.style.left = 5 + "px";
     fabElement.classList.remove('right');
     fabElement.classList.add('left');
   } else {
-    fabElement.style.left = windowWidth - 50 + "px";
+    fabElement.style.left = windowWidth - 70 + "px";
     fabElement.classList.remove('left');
     fabElement.classList.add('right');
   }
@@ -494,7 +506,7 @@ function initialMessage(){
         });
       }else if(color=="blue"){
         document.querySelector(".fab-btn").style.backgroundColor="#22b3ff";
-        document.querySelector("#chatui").style.backgroundColor="#22b3ff";
+        document.querySelector("#chatui").style.backgroundColor="#3c74ff";
         document.querySelector("#chatbody").style.backgroundColor="#e9f5fd";
         document.querySelectorAll("#chatbodyleft").forEach(element => {
           element.style.backgroundColor="#22b3ff";
@@ -505,7 +517,7 @@ function initialMessage(){
       }
       else if(color=="pink"){
         document.querySelector(".fab-btn").style.backgroundColor="#ff8da1";     
-        document.querySelector("#chatui").style.backgroundColor="#ff8da1";
+        document.querySelector("#chatui").style.backgroundColor="#ff5e7a";
         document.querySelector("#chatbody").style.backgroundColor="#ffe5ea";
         document.querySelectorAll("#chatbodyleft").forEach(element => {
           element.style.backgroundColor="#ff8da1";
@@ -537,7 +549,7 @@ function initialMessage(){
           });
         }else if(result.jinicolor=="blue"){
           document.querySelector(".fab-btn").style.backgroundColor="#22b3ff";
-          document.querySelector("#chatui").style.backgroundColor="#22b3ff";
+          document.querySelector("#chatui").style.backgroundColor="#3c74ff";
           document.querySelector("#chatbody").style.backgroundColor="#e9f5fd";
           document.querySelectorAll("#chatbodyleft").forEach(element => {
             element.style.backgroundColor="#22b3ff";
@@ -548,7 +560,7 @@ function initialMessage(){
         }
         else if(result.jinicolor=="pink"){
           document.querySelector(".fab-btn").style.backgroundColor="#ff8da1";        
-          document.querySelector("#chatui").style.backgroundColor="#ff8da1";
+          document.querySelector("#chatui").style.backgroundColor="#ff5e7a";
           document.querySelector("#chatbody").style.backgroundColor="#ffe5ea";
           document.querySelectorAll("#chatbodyleft").forEach(element => {
             element.style.backgroundColor="#ff8da1";

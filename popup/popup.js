@@ -23,4 +23,16 @@ document.addEventListener('DOMContentLoaded',()=>{
             }, 3000);
         });
     });
+    document.querySelector('#jinisubscribe').addEventListener('click', function() {
+        window.open("https://bmc.link/jinichat", "_blank");
+    });
+    document.querySelector('#jinicontactbtn').addEventListener('click', function() {
+        window.open("mailto:jinichatcontact@gmail.com", "_blank");
+    });
+
+    const jinilogo = document.createElement("img");
+    jinilogo.id = "jinilogo";
+    let jinilogopath = chrome.runtime.getURL("rectangle.png")
+    jinilogo.src = jinilogopath;
+    document.querySelector("#jinipopupheader").append(jinilogo);
 })
